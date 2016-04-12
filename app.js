@@ -1,9 +1,10 @@
 var app = require('express')();
-var bodyParser = require('body-parser')
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
   extended: true
-})); 
+}));
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var _ = require('lodash');
@@ -27,10 +28,15 @@ app.post('/question', function (req, res) {
 });
 
 app.post('/answer', function (req, res) {
-	console.log(req.body);
 	var question = _.find(state.questions, function(q) {
 		return q.id == req.body.id;
 	});
+	if (!question) {
+		return res.send({
+			error: 'Question not found.'
+		});
+	}
+
 	if(question.answer != undefined) {
 		question.answer = req.body.answer;
 		res.jsonp(question);
