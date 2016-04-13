@@ -38,5 +38,5 @@ setInterval(function(){
 	console.log("hola");
 socket.emit('question', availableQuestions[Math.floor(Math.random() * 3 )]);
 
-}, 3000); 
+}, 8000); 
 

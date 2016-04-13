@@ -10,7 +10,6 @@ var _ = require('lodash');
 
 var id = 0;
 var newQuestion = function(parameters) {
-	console.log(parameters);
 	return {'id': id++, 'question': parameters.question, 
 	'answer': null, 'emitter': parameters.emitter, answerer: null, 
 	'answerTimer': null };
@@ -32,7 +31,7 @@ questionsApi.on('connection',function(socket){
 
 
 io.of('/answers').on('connection', function(socket){
-	socket.on('startedWriting', function (questionToAnswer, callback) {
+	socket.on('startedWriting', function (questionToAnswer, cbk) {
 
 		var question = _.find(state.questions, function(q) {
 			return q.id == questionToAnswer.id;
@@ -41,12 +40,12 @@ io.of('/answers').on('connection', function(socket){
 		if(question.answerer === null) {
 			question.answerer = questionToAnswer.answerer;
 			questionsApi.emit('questions', state.questions);
-			socket.emit(state.question);
+			cbk(question);
 		} 
-		else callback(state.questions);
+		else cbk(questions);
 	});
 
-	socket.on('answer', function(questionToAnswer, callback){
+	socket.on('answer', function(questionToAnswer, cbk){
 		var question = _.find(state.questions, function(q) {
 			return q.id == questionToAnswer.id;
 		});
@@ -54,9 +53,9 @@ io.of('/answers').on('connection', function(socket){
 		if(question.answerer === questionToAnswer.answerer) {
 			question.answer = questionToAnswer.answer;
 			questionsApi.emit('questions', state.questions);
-			callback(question);
+			cbk(question);
 		} 
-		else socket.emit(question);
+		else cbk(question);
 
 	})
 
@@ -69,7 +68,7 @@ setInterval(function(){
 			question.answetTimer = null;
 		}
 	});
-	console.log(state.questions);
+	
 }, 1000);
 
 var server = app.listen(3000, function () {
