@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 
 var options = {
-	host: 'http://localhost',
+	host: 'http://localhost/questions',
     port: 3000,
     path: '/question',
     method: 'POST',
@@ -26,7 +26,7 @@ var availableQuestions = [ { question:'que hora es?', emitter:'kova'}, { questio
 //SyncedQuestionsOfList
 var questionsList = {};
 
-var socket = io(options.host);
+var socket = io('http://localhost:4000/questions');
 
 socket.on('questions', function (data) {
  	questionsList = data;
@@ -35,21 +35,8 @@ socket.on('questions', function (data) {
 
 
 setInterval(function(){
+	console.log("hola");
+socket.emit('question', availableQuestions[Math.floor(Math.random() * 3 )]);
 
-socket.emit('question', availableQuestions[Math.floor(Math.rand() * 3 )]);
+}, 3000); 
 
-}, 1000); 
-
-
-
-
-
-
-
-
-var server = app.listen(3001, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log('Server listening at http://%s:%s', host, port);
-});
